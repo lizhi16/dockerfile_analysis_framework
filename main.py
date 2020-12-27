@@ -14,7 +14,7 @@ class detecting_thread(threading.Thread):
 
     def run(self):
         dockerfile = crawl.resolve_images_info(self.image)
-        sourceEntry = trace_entry_images(dockerfile)
+        sourceEntry = parse2cmds.trace_entry_images(dockerfile)
         with open("./results/images.csv", "a+") as log:
             for item in sourceEntry:
                 log.write(self.image + ", " + item + ", " + sourceEntry[item].replace("\n", " ") + "\n")

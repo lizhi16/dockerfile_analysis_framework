@@ -134,7 +134,7 @@ def resolve_Dockerfile_from_dockerhub(image):
 
     url = 'https://hub.docker.com/v2/repositories/{}/dockerfile/'.format(str(image))
     content = get_url(url)
-    if content == None:
+    if content == "":
         return Dockerfile
     content = content.json()
 
