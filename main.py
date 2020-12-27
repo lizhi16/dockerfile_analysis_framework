@@ -18,15 +18,23 @@ class detecting_thread(threading.Thread):
         
 
 def main():
-    cores = 16
-
     images = open(sys.argv[1], "r").readlines()
+    index = 1
+    total = len(images)
+
+    cores = 16
+    analyze_thread = []
+
     for image in images:
         # check format
         if "/" not in image:
             continue
         
-        analyze_thread = []
+        # output the rate of processing
+        index = index + 1
+        if index % 100 == 0:
+            print ("Completing: [" + str(index) + "/" + str(total) + "]")
+
         thread = detecting_thread(image)
         # keep the threads < cores numbers
         if len(threading.enumerate()) <= cores:
