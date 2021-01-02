@@ -18,6 +18,9 @@ class detecting_thread(threading.Thread):
     def run(self):
         # get dockerfile from dockerhub
         dockerfile = crawl.resolve_images_info(self.image)
+        if dockerfile == None:
+            return
+        print (dockerfile)
 
         # resolve the dockerfile
         #dockerfile = parse2cmds.parse_dockerfile(dockerfile)

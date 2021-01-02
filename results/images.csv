@@ -1,0 +1,3 @@
+spryker/consul-aws-ecs, docker-entrypoint.sh, COPY file:2fc9ee792fd5d6e21568c1fcc92d825866250fafd9f3c82331ad98c840b3dd45 /usr/local/bin/docker-entrypoint.shCOPY file:8a481e657d90a5231c8dd0d155812f86fedc42a167c730eea5ec53ed0fe1835e /usr/local/bin/docker-entrypoint.sh
+rutle/service2, docker-entrypoint.sh, 
+spryker/consul-aws-ecs, docker-entrypoint.sh, COPY file:2fc9ee792fd5d6e21568c1fcc92d825866250fafd9f3c82331ad98c840b3dd45 /usr/local/bin/docker-entrypoint.shCOPY file:8a481e657d90a5231c8dd0d155812f86fedc42a167c730eea5ec53ed0fe1835e /usr/local/bin/docker-entrypoint.sh

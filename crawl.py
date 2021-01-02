@@ -27,6 +27,8 @@ def resolve_images_info(image):
         for item in tagsHistory:
             return tagsHistory[item]
 
+    return None
+
 
 def get_url(url):
     headers = {

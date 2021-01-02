@@ -42,9 +42,12 @@ def parse_exe_from_dockerfile(dockerfile):
 def parse_cmds_from_dockerfile(dockerfile):
     commands = []
 
-    for item in dockerfile['workdir']['/']['root']['run']:
-        command = split_bash_cmds(item)
-        commands = commands + command
+    try:
+        for item in dockerfile['workdir']['/']['root']['run']:
+            command = split_bash_cmds(item)
+            commands = commands + command
+    except:
+        return commands
 
     return commands
 
