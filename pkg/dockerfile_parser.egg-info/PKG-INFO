@@ -1,0 +1,15 @@
+Metadata-Version: 1.1
+Name: dockerfile-parser
+Version: 0.0.2
+Summary: Library for parsing Dockerfile.
+Home-page: https://github.com/eg0r/dockerfile-parser
+Author: Egor Smolyakov
+Author-email: egorsmkv@gmail.com
+License: MIT
+Description: UNKNOWN
+Keywords: docker dockerfile parser parsing
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

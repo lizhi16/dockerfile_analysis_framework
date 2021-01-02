@@ -1,0 +1,9 @@
+setup.py
+dockerfile_parser/__init__.py
+dockerfile_parser/filters.py
+dockerfile_parser/parser.py
+dockerfile_parser.egg-info/PKG-INFO
+dockerfile_parser.egg-info/SOURCES.txt
+dockerfile_parser.egg-info/dependency_links.txt
+dockerfile_parser.egg-info/not-zip-safe
+dockerfile_parser.egg-info/top_level.txt

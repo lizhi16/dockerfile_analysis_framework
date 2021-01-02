@@ -5,6 +5,9 @@ import threading
 import crawl
 import parse2cmds
 
+# using for debug
+failed_resolve = []
+
 class detecting_thread(threading.Thread):
     def __init__(self,image):
         threading.Thread.__init__(self)
@@ -13,12 +16,26 @@ class detecting_thread(threading.Thread):
         self.image = image.strip()
 
     def run(self):
+        # get dockerfile from dockerhub
         dockerfile = crawl.resolve_images_info(self.image)
+
+        # resolve the dockerfile
+        try:
+            dockerfile = parse2cmds.parse_dockerfile(dockerfile)
+        except:
+            failed_resolve.append(self.image)
+            print ("[ERR] Dockerfile resolve failed!")
+            return
+
         sourceEntry = parse2cmds.trace_entry_images(dockerfile)
+
+        # save the analysis results
         with open("./results/images.csv", "a+") as log:
             for item in sourceEntry:
-                log.write(self.image + ", " + item + ", " + sourceEntry[item].replace("\n", " ") + "\n")
-        
+                log.write(self.image + ", " + item + ", ")
+                for obj in sourceEntry[item]:
+                    log.write(obj.replace("\n", " "))
+                log.write("\n")
 
 def main():
     images = open(sys.argv[1], "r").readlines()
@@ -55,3 +72,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    # using for debug
+    with open("./results/failed_resolve.list", "a+") as log:
+        for item in failed_resolve:
+            log.write(item + "\n")

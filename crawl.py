@@ -5,7 +5,7 @@ def resolve_images_info(image):
     # get Dockerfile in dockerhub
     Dockerfile = resolve_Dockerfile_from_dockerhub(image)
     if Dockerfile != "":
-        #print (Dockerfile)
+        #print ("dockerfile:", Dockerfile)
         return Dockerfile
 
     # get Dockerfile in github
@@ -18,14 +18,13 @@ def resolve_images_info(image):
         #print (url)
         Dockerfile = resolve_Dockerfile_from_github(url)
         if Dockerfile != "":
-            #print (Dockerfile)
+            #print ("github:", Dockerfile)
             return Dockerfile
 
     # get build history in dockerhub
     tagsHistory = check_tags(image)
     if tagsHistory:
         for item in tagsHistory:
-            #print (tagsHistory[item])
             return tagsHistory[item]
 
 
@@ -91,8 +90,10 @@ def resolve_tags_to_imageHistory(image, tag):
     try:
         # [0] is needed, also only one result
         for commands in content[0]["layers"]:
-            if "exit 101" not in commands["instruction"]:
+            if "exit 101" not in commands["instruction"] and "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
                 imageHistory = imageHistory + "\n" + commands["instruction"].strip('[] ').replace("/bin/sh -c", "RUN").replace(" in ", " ")
+            elif "ENTRYPOINT" in commands["instruction"] or "CMD" in commands["instruction"]:
+                imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace(" in ", " ").replace("\" \"", " ")
         return imageHistory
     
     except Exception as e:
@@ -141,6 +142,7 @@ def resolve_Dockerfile_from_dockerhub(image):
     try:
         if content["contents"] != "":
             Dockerfile = content["contents"]
-            return Dockerfile
     except Exception as e:
         return Dockerfile
+
+    return Dockerfile
