@@ -286,7 +286,7 @@ def run_filter(items, value):
         RUN ["executable", "param1", "param2"]
     """
 
-    print (value, type(value))
+    #print (value, type(value))
     if _detect(value, assumption='array'):
         parse = json.loads(value)
         items.append(parse)
