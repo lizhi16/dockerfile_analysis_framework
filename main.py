@@ -20,7 +20,7 @@ class detecting_thread(threading.Thread):
         dockerfile = crawl.resolve_images_info(self.image)
         if dockerfile == None:
             return
-        print (dockerfile)
+        #print (dockerfile)
 
         # resolve the dockerfile
         #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
@@ -46,7 +46,7 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 1
+    cores = 16
     analyze_thread = []
 
     for image in images:
