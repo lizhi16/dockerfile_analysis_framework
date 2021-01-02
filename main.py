@@ -20,11 +20,12 @@ class detecting_thread(threading.Thread):
         dockerfile = crawl.resolve_images_info(self.image)
 
         # resolve the dockerfile
+        #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
         try:
             dockerfile = parse2cmds.parse_dockerfile(dockerfile)
         except:
             failed_resolve.append(self.image)
-            print ("[ERR] Dockerfile resolve failed!")
+            print ("[ERR] Dockerfile resolve failed: ", self.image)
             return
 
         sourceEntry = parse2cmds.trace_entry_images(dockerfile)
@@ -42,7 +43,7 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 16
+    cores = 1
     analyze_thread = []
 
     for image in images:

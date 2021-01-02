@@ -286,7 +286,7 @@ def run_filter(items, value):
         RUN ["executable", "param1", "param2"]
     """
 
-    #print (value, type(value))
+    print (value, type(value))
     if _detect(value, assumption='array'):
         parse = json.loads(value)
         items.append(parse)
@@ -355,7 +355,8 @@ def expose_filter(items, value):
             ports = value.split()
             if len(ports):
                 for port in ports:
-                    items.append(int(port))
+                    #items.append(int(port))
+                    items.append(port)
 
     return items
 

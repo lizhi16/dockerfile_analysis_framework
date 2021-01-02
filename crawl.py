@@ -90,9 +90,11 @@ def resolve_tags_to_imageHistory(image, tag):
     try:
         # [0] is needed, also only one result
         for commands in content[0]["layers"]:
-            if "exit 101" not in commands["instruction"] and "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
-                imageHistory = imageHistory + "\n" + commands["instruction"].strip('[] ').replace("/bin/sh -c", "RUN").replace(" in ", " ")
-            elif "ENTRYPOINT" in commands["instruction"] or "CMD" in commands["instruction"]:
+            if "set -ex" in commands["instruction"] or "set -eux" in commands["instruction"] or "exit 101" in commands["instruction"]:
+                continue
+            if "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
+                imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace("/bin/sh -c", "RUN").replace(" in ", " ").replace("]", "").replace("[", "")
+            else:
                 imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace(" in ", " ").replace("\" \"", " ")
         return imageHistory
     

