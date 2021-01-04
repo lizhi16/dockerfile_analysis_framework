@@ -36,7 +36,7 @@ class detecting_thread(threading.Thread):
         write_log(self.image, sourceEntry, "images")
 
         # identify the keywords
-        keywords = ["bash64 "]
+        keywords = ["base64 "]
         identify = parse2cmds.identify_keywords(dockerfile, keywords)
         write_log(self.image, identify, "keywords")
 

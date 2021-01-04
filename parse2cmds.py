@@ -139,15 +139,18 @@ def identify_keywords(dockerfile, keywords):
 
     # "keywords" is a list of keyword
     for keyword in keywords:
-        results[keyword] = []
+        identify = []
         
         # strat detect
         for command in commands:
             if keyword in command:
-                results[keyword].append(command)
+                identify.append(command)
 
         for entry in entrypoints:
             if keyword in entry:
-                results[keyword].append(entry)
+                identify.append(entry)
+
+        if len(identify) != 0:
+            results[keyword] = identify
 
     return results
