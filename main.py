@@ -18,9 +18,8 @@ class detecting_thread(threading.Thread):
     def run(self):
         # get dockerfile from dockerhub
         dockerfile = crawl.resolve_images_info(self.image)
-        if dockerfile == None:
+        if dockerfile == None or dockerfile == "":
             return
-        #print (dockerfile)
 
         # resolve the dockerfile
         #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
@@ -28,7 +27,7 @@ class detecting_thread(threading.Thread):
             dockerfile = parse2cmds.parse_dockerfile(dockerfile)
         except:
             failed_resolve.append(self.image)
-            print ("[ERR] Dockerfile resolve failed: ", self.image)
+            #print ("[ERR] Dockerfile resolve failed: ", self.image)
             return
 
         # trace the source of the scripts
