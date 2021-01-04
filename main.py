@@ -31,15 +31,25 @@ class detecting_thread(threading.Thread):
             print ("[ERR] Dockerfile resolve failed: ", self.image)
             return
 
+        # trace the source of the scripts
         sourceEntry = parse2cmds.trace_entry_images(dockerfile)
+        write_log(self.image, sourceEntry, "images")
 
-        # save the analysis results
-        with open("./results/images.csv", "a+") as log:
-            for item in sourceEntry:
-                log.write(self.image + ", " + item + ", ")
-                for obj in sourceEntry[item]:
-                    log.write(obj.replace("\n", " "))
-                log.write("\n")
+        # identify the keywords
+        keywords = ["bash64 "]
+        identify = parse2cmds.identify_keywords(dockerfile, keywords)
+        write_log(self.image, identify, "keywords")
+
+
+# log the detection results
+def write_log(image, results, filename):
+    path = "./results/" + filename + ".csv"
+    with open(path, "a+") as log:
+        for item in results:
+            log.write(image + ", " + item + ", ")
+            for obj in results[item]:
+                log.write(obj.replace("\n", " "))
+            log.write("\n")  
 
 def main():
     images = open(sys.argv[1], "r").readlines()

@@ -39,6 +39,13 @@ def parse_exe_from_dockerfile(dockerfile):
 
     return entrypoints
 
+def split_bash_cmds(commands):
+    # store the function in bash
+    commands = commands.replace("&&", ";")
+    command = commands.split(";")
+    
+    return command
+
 def parse_cmds_from_dockerfile(dockerfile):
     commands = []
 
@@ -50,13 +57,6 @@ def parse_cmds_from_dockerfile(dockerfile):
         return commands
 
     return commands
-
-def split_bash_cmds(commands):
-    # store the function in bash
-    commands = commands.replace("&&", ";")
-    command = commands.split(";")
-    
-    return command
 
 def parse_add_from_dockerfile(dockerfile):
     copy = []
@@ -77,6 +77,9 @@ def parse_add_from_dockerfile(dockerfile):
 
     return copy
 
+"""
+    trace the source of scripts in the entrypoint and cmd
+"""
 def trace_entry_images(dockerfile):
     # trace scripts
     sources_scripts = {}
@@ -120,3 +123,31 @@ def trace_entry_images(dockerfile):
 
     #print (sources_scripts)
     return sources_scripts
+
+
+"""
+    find the keywords if it are in the dockerfile
+"""
+def identify_keywords(dockerfile, keywords):
+    results = {}
+
+    # "RUN" commands
+    commands = parse_cmds_from_dockerfile(dockerfile)
+
+    # "ENTRYPOINT" or "CMD"
+    entrypoints = parse_exe_from_dockerfile(dockerfile)
+
+    # "keywords" is a list of keyword
+    for keyword in keywords:
+        results[keyword] = []
+        
+        # strat detect
+        for command in commands:
+            if keyword in command:
+                results[keyword].append(command)
+
+        for entry in entrypoints:
+            if keyword in entry:
+                results[keyword].append(entry)
+
+    return results
