@@ -22,7 +22,7 @@ class detecting_thread(threading.Thread):
             return
 
         # resolve the dockerfile
-        #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
+        dockerfile = parse2cmds.parse_dockerfile(dockerfile)
         try:
             dockerfile = parse2cmds.parse_dockerfile(dockerfile)
         except:

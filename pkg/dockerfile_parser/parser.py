@@ -370,7 +370,7 @@ def env_filter(items, value):
 
     if '=' in value:
         for env in _key_value_splitter(value):
-            variable, value = env.split('=')
+            variable, value = env.split('=', 1)
             items[variable] = _strip_quote(value)
     else:
         split = _strip_backslash(value).split()
