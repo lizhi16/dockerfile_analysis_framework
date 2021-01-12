@@ -41,7 +41,9 @@ def auth_repo_token(image):
         return ""
 
 # get images' manifest
-def get_image_manifest(image, tag):
+def get_image_manifest(image, tags):
+    manifest = []
+
     if "/" not in image:
         image = "library/" + image
 
@@ -49,7 +51,7 @@ def get_image_manifest(image, tag):
     token = auth_repo_token(image)
     if token == "":
         #print ("[ERR] Token get failed...")
-        return None
+        return manifest
     
     # get the manifest
     headers = {
@@ -57,31 +59,36 @@ def get_image_manifest(image, tag):
         'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
     }
 
-    url = "https://registry-1.docker.io/v2/{}/manifests/{}".format(str(image), str(tag))
-    content = get_url(url, headers)
+    for tag in tags:
+        url = "https://registry-1.docker.io/v2/{}/manifests/{}".format(str(image), str(tag))
+        content = get_url(url, headers)
 
-    if content != "":
-        return content.json()
-    else:
-        return None
+        if content != "":
+            manifest.append(content.json())
+    
+    return manifest
 
 # function1: url in layers
-def judge_url_layers(image, tag):
+def judge_url_layers(image, tags):
     urls = []
     # get manifest
-    manifest = get_image_manifest(image, tag)
+    manifests = get_image_manifest(image, tags)
 
     # error situations
-    if manifest == None:
-        return urls
-    elif "layers" not in manifest:
+    if len(manifest) == 0:
         return urls
 
-    for item in manifest['layers']:
-        if "urls" in item:
-            urls.append(item["urls"])
+    for manifest in manifests:
+        if "layers" not in manifest:
+            continue
+
+        for item in manifest['layers']:
+            if "urls" in item:
+                if item["urls"] not in urls:
+                    urls.append(item["urls"])
 
     return urls
 
-
+# test
+#judge_url_layers("ubuntu", ["18.04"])
 

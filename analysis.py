@@ -13,9 +13,7 @@ def identify_urls_layers(image):
     if len(tags) == 0:
         return urls
 
-    for tag in tags:
-        url = download.judge_url_layers(image, tag)
-        urls = urls + url
+    urls = download.judge_url_layers(image, tags)
 
     return urls
 
