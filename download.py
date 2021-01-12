@@ -27,14 +27,14 @@ def get_url(url, headers):
 
 # get token to access the registry 
 def auth_repo_token(image):
-	url= "https://auth.docker.io/token?service=registry.docker.io&scope=repository:{}:pull".format(str(image))
+    url= "https://auth.docker.io/token?service=registry.docker.io&scope=repository:{}:pull".format(str(image))
 	
-	content = get_url(url, "")
-	try:
-		token = content.json()["token"]
-		return token
-	except:
-		return ""
+    content = get_url(url, "")
+    try:
+        token = content.json()["token"]
+        return token
+    except:
+        return ""
 
 # get images' manifest
 def get_image_manifest(image, tag):
