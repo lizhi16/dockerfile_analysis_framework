@@ -2,53 +2,20 @@
 import sys
 import threading
 
-import crawl
-import parse2cmds
+import analysis
 
 # using for debug
 failed_resolve = []
 
 class detecting_thread(threading.Thread):
-    def __init__(self,image):
+    def __init__(self, image):
         threading.Thread.__init__(self)
         
         # image read from file contains "\n"
         self.image = image.strip()
 
     def run(self):
-        # get dockerfile from dockerhub
-        dockerfile = crawl.resolve_images_info(self.image)
-        if dockerfile == None or dockerfile == "":
-            return
-
-        # resolve the dockerfile
-        #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
-        try:
-            dockerfile = parse2cmds.parse_dockerfile(dockerfile)
-        except:
-            failed_resolve.append(self.image)
-            #print ("[ERR] Dockerfile resolve failed: ", self.image)
-            return
-
-        # trace the source of the scripts
-        sourceEntry = parse2cmds.trace_entry_images(dockerfile)
-        write_log(self.image, sourceEntry, "images")
-
-        # identify the keywords
-        keywords = ["base64 "]
-        identify = parse2cmds.identify_keywords(dockerfile, keywords)
-        write_log(self.image, identify, "keywords")
-
-
-# log the detection results
-def write_log(image, results, filename):
-    path = "./results/" + filename + ".csv"
-    with open(path, "a+") as log:
-        for item in results:
-            log.write(image + ", " + item + ", ")
-            for obj in results[item]:
-                log.write(obj.replace("\n", " "))
-            log.write("\n")  
+        analysis.identify_urls_layers(self.image)
 
 def main():
     images = open(sys.argv[1], "r").readlines()

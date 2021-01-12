@@ -45,7 +45,7 @@ def get_image_manifest(image, tag):
     token = auth_repo_token(image)
     if token == "":
         print ("[ERR] Token get failed...")
-        return 
+        return None
     
     # get the manifest
     headers = {
@@ -69,9 +69,9 @@ def judge_url_layers(image, tag):
 
     # error situations
     if manifest == None:
-        return False
+        return urls
     elif "layers" not in manifest:
-        return False
+        return urls
 
     for item in manifest['layers']:
         if "urls" in item:

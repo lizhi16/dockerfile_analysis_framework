@@ -22,7 +22,7 @@ def resolve_images_info(image):
             return Dockerfile
 
     # get build history in dockerhub
-    tagsHistory = check_tags(image)
+    tagsHistory = tags_to_history(image)
     if tagsHistory:
         for item in tagsHistory:
             return tagsHistory[item]
@@ -48,38 +48,47 @@ def get_url(url):
     except:
         return ""
 
-def check_tags(image):
-    # the build history to the tags
-    tagsHistory = {}
+def resolve_tags(image):
+    tags = []
 
     # crawl the images tags
     url = 'https://hub.docker.com/v2/repositories/{}/tags/'.format(str(image))
     content = get_url(url)
     if content == "":
-        return tagsHistory
+        return tags
     content = content.json()
 
+    if "results" not in content:
+        return tags
+    elif len(content["results"]) == 0:
+        return tags
+
+    # get image's tags
     try:
-        tags = content["results"]
-        if len(tags) == 0:
-            return tagsHistory
-
-        for tag in tags:
-            # get image's tags
-            tagName = tag["name"]
-
-            # get build history of each tag, "history" is a list []
-            history = resolve_tags_to_imageHistory(image, tag["name"])
-            if history != "":
-                tagsHistory[tagName] = history
+        for tag in content["results"]:
+            tags.append(tag["name"])
         
+        return tags
+    except:
+        return tags
+
+def tags_to_history(image):
+    tagsHistory = {}
+
+    tags = resolve_tags(image)
+    if len(tags) == 0:
         return tagsHistory
-    
-    except Exception as e:
-        return tagsHistory
+
+    for tagName in tags:
+        # get build history of each tag, "history" is a list []
+        history = resolve_imageHistory(image, tagName)
+        if history != "":
+            tagsHistory[tagName] = history
+        
+    return tagsHistory
 
 # Getting the Dockerfile from "tags" page.
-def resolve_tags_to_imageHistory(image, tag):
+def resolve_imageHistory(image, tag):
     # content of build history
     imageHistory = ""
 
