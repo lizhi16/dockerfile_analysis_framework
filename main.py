@@ -22,6 +22,7 @@ class detecting_thread(threading.Thread):
             results[self.image] = urls
 
 def main():
+    global results
     images = open(sys.argv[1], "r").readlines()
     index = 1
     total = len(images)
@@ -62,6 +63,11 @@ def main():
 
     for t in analyze_thread:
         t.join()
+
+    with open("./results/urls_layers.csv", "a+") as log:
+        for item in results:
+            for url in results[item]:
+                log.write(item + ", " + str(url) + "\n")
 
 if __name__ == '__main__':
     main()
