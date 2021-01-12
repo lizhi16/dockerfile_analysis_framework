@@ -11,18 +11,13 @@ def identify_urls_layers(image):
 
     tags = crawl.resolve_tags(image)
     if len(tags) == 0:
-        return False
+        return urls
 
     for tag in tags:
         url = download.judge_url_layers(image, tag)
         urls = urls + url
 
-    #return urls
-    with open(basePath + "urls_layers.csv", "a+") as log:
-        for url in urls:
-            log.write(image + ", " + str(url) + "\n")
-
-    return True
+    return urls
 
 
 """
@@ -54,7 +49,7 @@ def trace_keywords(image):
 
 # log the detection results
 def write_log(image, results, filename):
-    path = "./results/" + filename + ".csv"
+    path = basePath + filename + ".csv"
     with open(path, "a+") as log:
         for item in results:
             log.write(image + ", " + item + ", ")

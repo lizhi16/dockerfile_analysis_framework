@@ -7,6 +7,8 @@ import analysis
 # using for debug
 failed_resolve = []
 
+results = {}
+
 class detecting_thread(threading.Thread):
     def __init__(self, image):
         threading.Thread.__init__(self)
@@ -15,14 +17,16 @@ class detecting_thread(threading.Thread):
         self.image = image.strip()
 
     def run(self):
-        analysis.identify_urls_layers(self.image)
+        urls = analysis.identify_urls_layers(self.image)
+        if len(urls) != 0:
+            results[self.image] = urls
 
 def main():
     images = open(sys.argv[1], "r").readlines()
     index = 1
     total = len(images)
 
-    cores = 16
+    cores = 32
     analyze_thread = []
 
     for image in images:
@@ -32,8 +36,6 @@ def main():
         
         # output the rate of processing
         index = index + 1
-        if index % 100 == 0:
-            print ("Completing: [" + str(index) + "/" + str(total) + "]")
 
         thread = detecting_thread(image)
         # keep the threads < cores numbers
@@ -43,6 +45,17 @@ def main():
         else:
             for t in analyze_thread:
                 t.join()
+
+            # info reports
+            if index % 100 == 0:
+                print ("Completing: [" + str(index) + "/" + str(total) + "]")
+
+            with open("./results/urls_layers.csv", "a+") as log:
+                for item in results:
+                    for url in results[item]:
+                        log.write(item + ", " + str(url) + "\n")
+
+            results = {}
             
             thread.start()
             analyze_thread.append(thread)
