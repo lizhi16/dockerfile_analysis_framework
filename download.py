@@ -75,7 +75,7 @@ def judge_url_layers(image, tags):
     manifests = get_image_manifest(image, tags)
 
     # error situations
-    if len(manifest) == 0:
+    if len(manifests) == 0:
         return urls
 
     for manifest in manifests:
