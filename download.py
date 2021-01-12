@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 
 #registryBase='https://registry-1.docker.io'
@@ -6,16 +7,19 @@ import requests
 #authService='registry.docker.io'
 
 def get_url(url, headers):
-    if headers == "":
-        headers = {
-        'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
-    } 
-
     try:
-        content = requests.get(url, headers=headers)
+        if headers == "":
+            content = requests.get(url)
+        else:
+            content = requests.get(url, headers=headers)
+
         while content.status_code == 429:
             time.sleep(60)
-            content = requests.get(url,headers=headers)
+
+            if headers == "":
+                content = requests.get(url)
+            else:
+                content = requests.get(url, headers=headers)
 
         if content.status_code == 200:
             return content
@@ -44,7 +48,7 @@ def get_image_manifest(image, tag):
     # get token
     token = auth_repo_token(image)
     if token == "":
-        print ("[ERR] Token get failed...")
+        #print ("[ERR] Token get failed...")
         return None
     
     # get the manifest

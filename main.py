@@ -37,6 +37,8 @@ def main():
         
         # output the rate of processing
         index = index + 1
+        if index % 100 == 0:
+            print ("Completing: [" + str(index) + "/" + str(total) + "]")
 
         thread = detecting_thread(image)
         # keep the threads < cores numbers
@@ -46,10 +48,6 @@ def main():
         else:
             for t in analyze_thread:
                 t.join()
-
-            # info reports
-            if index % 100 == 0:
-                print ("Completing: [" + str(index) + "/" + str(total) + "]")
 
             with open("./results/urls_layers.csv", "a+") as log:
                 for item in results:
