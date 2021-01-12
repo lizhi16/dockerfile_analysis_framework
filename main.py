@@ -27,7 +27,7 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 32
+    cores = 8
     analyze_thread = []
 
     for image in images:
@@ -49,12 +49,14 @@ def main():
             for t in analyze_thread:
                 t.join()
 
-            with open("./results/urls_layers.csv", "a+") as log:
-                for item in results:
-                    for url in results[item]:
-                        log.write(item + ", " + str(url) + "\n")
+            # write log
+            if index % 100 == 0:
+                with open("./results/urls_layers.csv", "a+") as log:
+                    for item in results:
+                        for url in results[item]:
+                            log.write(item + ", " + str(url) + "\n")
 
-            results = {}
+                results = {}
             
             thread.start()
             analyze_thread.append(thread)
