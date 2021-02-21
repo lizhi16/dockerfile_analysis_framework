@@ -41,7 +41,7 @@ def trace_keywords(image):
     write_log(image, sourceEntry, "images")
 
     # identify the keywords
-    keywords = ["base64 "]
+    keywords = ["paste ", "split "]
     identify = parse2cmds.identify_keywords(dockerfile, keywords)
     write_log(image, identify, "keywords")
 

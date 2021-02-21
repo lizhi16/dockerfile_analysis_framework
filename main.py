@@ -17,9 +17,10 @@ class detecting_thread(threading.Thread):
         self.image = image.strip()
 
     def run(self):
-        urls = analysis.identify_urls_layers(self.image)
-        if len(urls) != 0:
-            results[self.image] = urls
+        analysis.trace_keywords(self.image)
+        #urls = analysis.identify_urls_layers(self.image)
+        #if len(urls) != 0:
+        #    results[self.image] = urls
 
 def main():
     global results
@@ -49,25 +50,18 @@ def main():
             for t in analyze_thread:
                 t.join()
 
-            # write log
-            if index % 100 == 0:
-                with open("./results/urls_layers.csv", "a+") as log:
-                    for item in results:
-                        for url in results[item]:
-                            log.write(item + ", " + str(url) + "\n")
-
-                results = {}
-            
             thread.start()
             analyze_thread.append(thread)
 
     for t in analyze_thread:
         t.join()
 
+    """
     with open("./results/urls_layers.csv", "a+") as log:
         for item in results:
             for url in results[item]:
                 log.write(item + ", " + str(url) + "\n")
+    """
 
 if __name__ == '__main__':
     main()
