@@ -20,7 +20,11 @@ class detecting_thread(threading.Thread):
         commands = parse2cmds.dockerfile2cmds(self.image)
         if "RUN" not in commands:
             return
+        
         words = cmd2words.docker_bash_parser(commands)
+        if len(words) == 0:
+            return
+
         results[self.image] = words
 
 def main():

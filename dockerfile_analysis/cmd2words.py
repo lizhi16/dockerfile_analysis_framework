@@ -8,7 +8,11 @@ def docker_bash_parser(commands):
 
     for command in commands["RUN"]:
         # get beshlex AST
-        parts = bashlex.parse(command)
+        try:
+            parts = bashlex.parse(command)
+        except:
+            return cmds
+
         for ast in parts:
             cmd = []
             try:
