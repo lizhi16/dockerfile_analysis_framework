@@ -64,7 +64,7 @@ def main():
 
 def log():
     try:
-        prefix = sys.argv[1].split("/")[1]
+        prefix = sys.argv[1].split("/")[2]
     except:
         prefix = "-1"
 
