@@ -55,8 +55,9 @@ def main():
             for t in analyze_thread:
                 t.join()
 
-            log()
-            results = {}
+            if index % 1000 == 0:
+                log()
+                results = {}
 
             thread.start()
             analyze_thread.append(thread)
