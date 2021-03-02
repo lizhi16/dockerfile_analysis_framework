@@ -1,7 +1,32 @@
 ################### Handle Dockerfile #####################
 import json
+import crawl
 from json import dumps
 from dockerfile_parser import parser 
+
+# major function
+def dockerfile2cmds(image):
+    commands = {}
+
+    # get dockerfile from dockerhub
+    dockerfile = crawl.resolve_images_info(image)
+    if dockerfile == None or dockerfile == "":
+        print ("[ERR] dockerfile carwling failed...")
+        return commands
+
+    # resolve the dockerfile
+    #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
+    try:
+        dockerfile = parse_dockerfile(dockerfile)
+    except:
+        print ("[ERR] Dockerfile resolve failed: ", image)
+        return commands
+
+    commands["RUN"] = parse_cmds_from_dockerfile(dockerfile)
+    commands["CMD"] = parse_exe_from_dockerfile(dockerfile)
+    commands["ADD"] = parse_add_from_dockerfile(dockerfile)
+
+    return commands
 
 def parse_dockerfile(path):
     parsed = parser.parse(path)
@@ -10,6 +35,7 @@ def parse_dockerfile(path):
 
     return dockerfile
 
+# parsing "CMD" and "ENTRYPOINT"
 def parse_exe_from_dockerfile(dockerfile):
     entrypoints = []
     try:
@@ -39,6 +65,7 @@ def parse_exe_from_dockerfile(dockerfile):
 
     return entrypoints
 
+
 def split_bash_cmds(commands):
     # store the function in bash
     commands = commands.replace("&&", ";")
@@ -46,6 +73,7 @@ def split_bash_cmds(commands):
     
     return command
 
+# parsing "RUN" commnads
 def parse_cmds_from_dockerfile(dockerfile):
     commands = []
 
@@ -58,6 +86,7 @@ def parse_cmds_from_dockerfile(dockerfile):
 
     return commands
 
+# parsing "ADD" and "COPY" commnads
 def parse_add_from_dockerfile(dockerfile):
     copy = []
 
@@ -76,81 +105,3 @@ def parse_add_from_dockerfile(dockerfile):
         pass
 
     return copy
-
-"""
-    trace the source of scripts in the entrypoint and cmd
-"""
-def trace_entry_images(dockerfile):
-    # trace scripts
-    sources_scripts = {}
-
-    # get the entrypoint 
-    entrypoint = parse_exe_from_dockerfile(dockerfile)
-    if len(entrypoint) == 0:
-        return sources_scripts
-
-    # get scripts executed in ENTRYPOINT or CMD
-    scripts = []
-    for cmds in entrypoint:
-        for cmd in cmds.split(" "):
-            if ".sh" in cmd or ".py" in cmd:
-                cmd = cmd.strip().replace("./", "")
-                scripts.append(cmd)
-
-    # trace the source of the scripts
-    commands = parse_cmds_from_dockerfile(dockerfile)
-    for script in scripts:
-        # from RUN commands
-        for command in commands:
-            if script in command:
-                if script not in sources_scripts:
-                    sources_scripts[script] = [command]
-                else:
-                    sources_scripts[script].append(command)
-
-        # from COPY or ADD
-        copy = parse_add_from_dockerfile(dockerfile)
-        for external in copy:
-            if script in external:
-                if script not in sources_scripts:
-                    sources_scripts[script] = [external]
-                else:
-                    sources_scripts[script].append(external)
-
-        # cannot find the source of script from commands
-        if script not in sources_scripts:
-            sources_scripts[script] = []
-
-    #print (sources_scripts)
-    return sources_scripts
-
-
-"""
-    find the keywords if it are in the dockerfile
-"""
-def identify_keywords(dockerfile, keywords):
-    results = {}
-
-    # "RUN" commands
-    commands = parse_cmds_from_dockerfile(dockerfile)
-
-    # "ENTRYPOINT" or "CMD"
-    entrypoints = parse_exe_from_dockerfile(dockerfile)
-
-    # "keywords" is a list of keyword
-    for keyword in keywords:
-        identify = []
-        
-        # strat detect
-        for command in commands:
-            if keyword in command:
-                identify.append(command)
-
-        for entry in entrypoints:
-            if keyword in entry:
-                identify.append(entry)
-
-        if len(identify) != 0:
-            results[keyword] = identify
-
-    return results

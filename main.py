@@ -2,11 +2,11 @@
 import sys
 import threading
 
-import analysis
+from dockerfile_analysis import cmd2words
+import parse2cmds
 
 # using for debug
 failed_resolve = []
-
 results = {}
 
 class detecting_thread(threading.Thread):
@@ -17,10 +17,11 @@ class detecting_thread(threading.Thread):
         self.image = image.strip()
 
     def run(self):
-        analysis.trace_keywords(self.image)
-        #urls = analysis.identify_urls_layers(self.image)
-        #if len(urls) != 0:
-        #    results[self.image] = urls
+        commands = parse2cmds.dockerfile2cmds(self.image)
+        if "RUN" not in commands:
+            return
+        words = cmd2words.docker_bash_parser(commands)
+        results[self.image] = words
 
 def main():
     global results
@@ -50,23 +51,26 @@ def main():
             for t in analyze_thread:
                 t.join()
 
+            log()
+            results = {}
+
             thread.start()
             analyze_thread.append(thread)
 
     for t in analyze_thread:
         t.join()
+    
+    log()
 
-    """
-    with open("./results/urls_layers.csv", "a+") as log:
+def log():
+    try:
+        prefix = sys.argv[1].split("/")[1]
+    except:
+        prefix = "-1"
+
+    with open("./results/words-" + prefix + ".list", "a+") as log:
         for item in results:
-            for url in results[item]:
-                log.write(item + ", " + str(url) + "\n")
-    """
+            log.write(str(item) + "; " + str(results[item]) + "\n")
 
 if __name__ == '__main__':
     main()
-
-    # using for debug
-    with open("./results/failed_resolve.list", "a+") as log:
-        for item in failed_resolve:
-            log.write(item + "\n")
