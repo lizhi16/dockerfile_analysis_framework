@@ -1,0 +1,2 @@
+cw1031/hello-world; [['apk', 'update'], ['apk', 'add', 'nodejs'], ['mkdir', '-p', '/usr/src/app']]
+arclupin/get-started; [['apt-get', 'update'], ['apt-get', 'install', '-y', '--no-install-recommends', 'ca-certificates', 'netbase'], ['rm', '-rf', '/var/lib/apt/lists/*']]

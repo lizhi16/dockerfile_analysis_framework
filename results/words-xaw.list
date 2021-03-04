@@ -1,0 +1,1 @@
+alexrgb/sinatra; [['rm', '-rf', '/var/lib/apt/lists/*'], ['sed', '-i', 's/^#s*(deb.*universe)$/1/g', '/etc/apt/sources.list'], ['mkdir', '-p', '/run/systemd'], ['apt-get', 'update'], ['apt-get', 'install', '-y', 'ruby', 'ruby-dev'], ['gem', 'install', 'sinatra']]

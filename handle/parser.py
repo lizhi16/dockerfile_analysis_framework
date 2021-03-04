@@ -1,25 +1,52 @@
-################### Handle Dockerfile #####################
+################### Parser Dockerfile #####################
 import json
-import crawl
+import crawler
+import collections, logging, itertools
+
+import bashlex.parser
+import bashlex.ast
+
 from json import dumps
 from dockerfile_parser import parser 
 
 # major function
-def dockerfile2cmds(image):
-    commands = {}
+def dockerfile2bash(dockerfile):
+    cmds = []
+    commands = dockerfile2cmds(dockerfile)
+    if len(commands) == 0:
+        return cmds
 
-    # get dockerfile from dockerhub
-    dockerfile = crawl.resolve_images_info(image)
+    for command in commands["RUN"]:
+        # get beshlex AST
+        try:
+            parts = bashlex.parse(command)
+        except:
+            return cmds
+
+        for ast in parts:
+            cmd = []
+            try:
+                for i in range(len(ast.parts)):
+                    word = ast.parts[i].word
+                    cmd.append(word)
+                cmds.append(cmd)
+            except:
+                continue
+
+    return cmds
+
+# paras "dockerfile": return from crawler.resolve_images_info(image)
+def dockerfile2cmds(dockerfile):
+    commands = {}
     if dockerfile == None or dockerfile == "":
-        print ("[ERR] dockerfile carwling failed...")
+        print ("[ERR] dockerfile format error...")
         return commands
 
     # resolve the dockerfile
-    #dockerfile = parse2cmds.parse_dockerfile(dockerfile)
     try:
         dockerfile = parse_dockerfile(dockerfile)
     except:
-        print ("[ERR] Dockerfile resolve failed: ", image)
+        print ("[ERR] Dockerfile parsing failed...")
         return commands
 
     commands["RUN"] = parse_cmds_from_dockerfile(dockerfile)

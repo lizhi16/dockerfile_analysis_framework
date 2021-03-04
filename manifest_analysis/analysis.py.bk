@@ -1,0 +1,18 @@
+import crawl
+import download
+import parser
+
+basePath = "./results/"
+"""
+judge if urls indicate a images's layers
+"""
+def identify_urls_layers(image):
+    urls = []
+
+    tags = crawl.resolve_tags(image)
+    if len(tags) == 0:
+        return urls
+
+    urls = download.judge_url_layers(image, tags)
+
+    return urls

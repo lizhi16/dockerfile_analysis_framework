@@ -1,6 +1,13 @@
-# Crawling dockerhub for all Dockerfile
-import requests
+# =======================================================
+#   Crawling "Dockerfile" from dockerhub or Github:
+#   1. Dockerfile
+#   2. build history
+# =======================================================
 
+import requests
+import filter
+
+# major function
 def resolve_images_info(image):
     # get Dockerfile in dockerhub
     Dockerfile = resolve_Dockerfile_from_dockerhub(image)
@@ -15,7 +22,6 @@ def resolve_images_info(image):
     githubRepo = check_github_repo(user, imageName)
     if githubRepo != "":
         url = "https://raw.githubusercontent.com" + githubRepo + "/Dockerfile"
-        #print (url)
         Dockerfile = resolve_Dockerfile_from_github(url)
         if Dockerfile != "":
             #print ("github:", Dockerfile)
@@ -28,7 +34,6 @@ def resolve_images_info(image):
             return tagsHistory[item]
 
     return None
-
 
 def get_url(url):
     headers = {
@@ -101,7 +106,7 @@ def resolve_imageHistory(image, tag):
     try:
         # [0] is needed, also only one result
         for commands in content[0]["layers"]:
-            if "set -ex" in commands["instruction"] or "set -eux" in commands["instruction"] or "exit 101" in commands["instruction"]:
+            if filter.exsit(commands["instruction"], "meaningless_words", "or"):
                 continue
             if "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
                 imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace("/bin/sh -c", "RUN").replace(" in ", " ").replace("]", "").replace("[", "")

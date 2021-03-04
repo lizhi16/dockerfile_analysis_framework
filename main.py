@@ -1,9 +1,7 @@
 # Crawling dockerhub for all Dockerfile, and checking this Dockerfile whether has malicious behaviors
 import sys
 import threading
-
-from dockerfile_analysis import cmd2words
-import parse2cmds
+import parser
 
 # using for debug
 failed_resolve = []
@@ -17,7 +15,7 @@ class detecting_thread(threading.Thread):
         self.image = image.strip()
 
     def run(self):
-        commands = parse2cmds.dockerfile2cmds(self.image)
+        commands = parser.dockerfile2cmds(self.image)
         if "RUN" not in commands:
             return
         
@@ -33,12 +31,12 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 8
+    cores = 64
     analyze_thread = []
 
     for image in images:
         # check format
-        if "/" not in image:
+        if "/" not in image and not image.startswith("/"):
             continue
         
         # output the rate of processing
@@ -54,10 +52,6 @@ def main():
         else:
             for t in analyze_thread:
                 t.join()
-
-            if index % 1000 == 0:
-                log()
-                results = {}
 
             thread.start()
             analyze_thread.append(thread)

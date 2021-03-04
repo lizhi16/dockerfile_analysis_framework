@@ -1,6 +1,4 @@
-import crawl
-import download
-import parse2cmds
+import parser
 
 basePath = "./results/"
 
@@ -10,12 +8,12 @@ keywords: target keyword list
 """
 def trace_keywords(dockerfile, keywords):
     # trace the source of the scripts
-    sourceEntry = parse2cmds.trace_entry_images(dockerfile)
+    sourceEntry = trace_entry_images(dockerfile)
     write_log(image, sourceEntry, "images")
 
     # identify the keywords
     keywords = ["paste ", "split "]
-    identify = parse2cmds.identify_keywords(dockerfile, keywords)
+    identify = identify_keywords(dockerfile, keywords)
     write_log(image, identify, "keywords")
 
 
@@ -27,7 +25,7 @@ def trace_entry_images(dockerfile):
     sources_scripts = {}
 
     # get the entrypoint 
-    entrypoint = parse2cmds.parse_exe_from_dockerfile(dockerfile)
+    entrypoint = parser.parse_exe_from_dockerfile(dockerfile)
     if len(entrypoint) == 0:
         return sources_scripts
 
@@ -40,7 +38,7 @@ def trace_entry_images(dockerfile):
                 scripts.append(cmd)
 
     # trace the source of the scripts
-    commands = parse2cmds.parse_cmds_from_dockerfile(dockerfile)
+    commands = parser.parse_cmds_from_dockerfile(dockerfile)
     for script in scripts:
         # from RUN commands
         for command in commands:
@@ -51,7 +49,7 @@ def trace_entry_images(dockerfile):
                     sources_scripts[script].append(command)
 
         # from COPY or ADD
-        copy = parse2cmds.parse_add_from_dockerfile(dockerfile)
+        copy = parser.parse_add_from_dockerfile(dockerfile)
         for external in copy:
             if script in external:
                 if script not in sources_scripts:
@@ -74,10 +72,10 @@ def identify_keywords(dockerfile, keywords):
     results = {}
 
     # "RUN" commands
-    commands = parse2cmds.parse_cmds_from_dockerfile(dockerfile)
+    commands = parser.parse_cmds_from_dockerfile(dockerfile)
 
     # "ENTRYPOINT" or "CMD"
-    entrypoints = parse2cmds.parse_exe_from_dockerfile(dockerfile)
+    entrypoints = parser.parse_exe_from_dockerfile(dockerfile)
 
     # "keywords" is a list of keyword
     for keyword in keywords:
@@ -96,17 +94,3 @@ def identify_keywords(dockerfile, keywords):
             results[keyword] = identify
 
     return results
-
-
-
-# log the detection results
-"""
-def write_log(image, results, filename):
-    path = basePath + filename + ".csv"
-    with open(path, "a+") as log:
-        for item in results:
-            log.write(image + ", " + item + ", ")
-            for obj in results[item]:
-                log.write(obj.replace("\n", " "))
-            log.write("\n") 
-"""
