@@ -1,7 +1,7 @@
 # Crawling dockerhub for all Dockerfile, and checking this Dockerfile whether has malicious behaviors
 import sys
 import threading
-import parser
+import crawler
 
 # using for debug
 failed_resolve = []
@@ -10,20 +10,16 @@ results = {}
 class detecting_thread(threading.Thread):
     def __init__(self, image):
         threading.Thread.__init__(self)
-        
         # image read from file contains "\n"
         self.image = image.strip()
 
     def run(self):
-        commands = parser.dockerfile2cmds(self.image)
-        if "RUN" not in commands:
+        dockerfile = crawler.resolve_images_info(self.image)
+        if dockerfile == None or dockerfile == "":
+            print ("[ERR] not dockerfile", self.image)
             return
-        
-        words = cmd2words.docker_bash_parser(commands)
-        if len(words) == 0:
-            return
-
-        results[self.image] = words
+            
+        results[self.image] = dockerfile
 
 def main():
     global results
@@ -31,7 +27,7 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 64
+    cores = 8
     analyze_thread = []
 
     for image in images:
@@ -59,9 +55,6 @@ def main():
     for t in analyze_thread:
         t.join()
     
-    log()
-
-def log():
     try:
         prefix = sys.argv[1].split("/")[2]
     except:
@@ -70,6 +63,7 @@ def log():
     with open("./results/words-" + prefix + ".list", "a+") as log:
         for item in results:
             log.write(str(item) + "; " + str(results[item]) + "\n")
+    
 
 if __name__ == '__main__':
     main()
