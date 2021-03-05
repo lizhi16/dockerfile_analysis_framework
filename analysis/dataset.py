@@ -22,8 +22,14 @@ def clean_data(words_list):
 
     # pass parametes
     for word in words_list:
-        if not word.startswith("-"):
-            doc = doc + " " + word
+        if "apt-get" == word or "apt" == word or "install" == word or "yum" == word or "git" == word:
+            continue
+            
+        if not word.startswith("-") and len(word) < 15:
+            try:
+                tmp = int(word)
+            except:
+                doc = doc + " " + word
     
     return doc
 
