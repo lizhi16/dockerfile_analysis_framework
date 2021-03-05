@@ -31,6 +31,7 @@ def resolve_images_info(image):
     tagsHistory = tags_to_history(image)
     if tagsHistory:
         for item in tagsHistory:
+            #print (tagsHistory[item])
             return tagsHistory[item]
 
     return None
@@ -84,6 +85,8 @@ def tags_to_history(image):
     if len(tags) == 0:
         return tagsHistory
 
+    print (tags)
+
     for tagName in tags:
         # get build history of each tag, "history" is a list []
         history = resolve_imageHistory(image, tagName)
@@ -106,8 +109,8 @@ def resolve_imageHistory(image, tag):
     try:
         # [0] is needed, also only one result
         for commands in content[0]["layers"]:
-            if filter.exsit(commands["instruction"], "meaningless_words", "or"):
-                continue
+            #if filter.exsit(commands["instruction"], "meaningless_words", "or"):
+            #    continue
             if "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
                 imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace("/bin/sh -c", "RUN").replace(" in ", " ").replace("]", "").replace("[", "")
             else:
