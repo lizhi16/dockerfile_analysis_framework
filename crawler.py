@@ -4,6 +4,7 @@
 #   2. build history
 # =======================================================
 
+import time
 import requests
 import filter
 
@@ -43,15 +44,18 @@ def get_url(url):
 
     try:
         content = requests.get(url, headers=headers)
+        print (url, content.status_code)
         while content.status_code == 429:
+            print ("[WARN] wait for 429!")
             time.sleep(60)
-            content = requests.get(url,headers=headers)
+            content = requests.get(url, headers=headers)
 
         if content.status_code == 200:
             return content
         else:
             return ""
-    except:
+    except Exception as e:
+        print ("429 !!!!!!!!!!!!!", e)
         return ""
 
 def resolve_tags(image):
