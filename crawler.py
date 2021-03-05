@@ -85,8 +85,6 @@ def tags_to_history(image):
     if len(tags) == 0:
         return tagsHistory
 
-    print (tags)
-
     for tagName in tags:
         # get build history of each tag, "history" is a list []
         history = resolve_imageHistory(image, tagName)
