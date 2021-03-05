@@ -5,3 +5,37 @@ RUN  -z "$(apt-get indextargets)"
 RUN mkdir -p /run/systemd && echo 'docker' > /run/systemd/container
 CMD ["/bin/bash"]
 /bin/bash
+010120190101/hotelservice; 
+ADD file:a86aea1f3a7d68f6ae03397b99ea77f2e9ee901c5c59e59f76f93adbb4035913 /
+CMD ["/bin/sh"]
+ENV LANG=C.UTF-8
+RUN { 		echo '#!/bin/sh'; 		echo 'set -e'; 		echo; 		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; 	} > /usr/local/bin/docker-java-home 	&& chmod +x /usr/local/bin/docker-java-home
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk/jre
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
+ENV JAVA_VERSION=8u212
+ENV JAVA_ALPINE_VERSION=8.212.04-r0
+RUN set -x 	&& apk add --no-cache 		openjdk8-jre="$JAVA_ALPINE_VERSION" 	&&  "$JAVA_HOME" = "$(docker-java-home)" 
+ENV APP_HOME=/usr/app
+EXPOSE 8080
+COPY file:4d36db25e1460e0134ab61ce33c5f37aad7bb64ffae018f314cc280630784037 /usr/app/
+WORKDIR /usr/app
+ENTRYPOINT ["sh -c"]
+ENV APP_FILE=hotelservice-0.0.1-SNAPSHOT.jar
+CMD ["exec java -jar $APP_FILE"]
+010120190101/hotelservice; 
+ADD file:a86aea1f3a7d68f6ae03397b99ea77f2e9ee901c5c59e59f76f93adbb4035913 /
+CMD ["/bin/sh"]
+ENV LANG=C.UTF-8
+RUN { 		echo '#!/bin/sh'; 		echo 'set -e'; 		echo; 		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; 	} > /usr/local/bin/docker-java-home 	&& chmod +x /usr/local/bin/docker-java-home
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk/jre
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
+ENV JAVA_VERSION=8u212
+ENV JAVA_ALPINE_VERSION=8.212.04-r0
+RUN set -x 	&& apk add --no-cache 		openjdk8-jre="$JAVA_ALPINE_VERSION" 	&&  "$JAVA_HOME" = "$(docker-java-home)" 
+ENV APP_HOME=/usr/app
+EXPOSE 8080
+COPY file:4d36db25e1460e0134ab61ce33c5f37aad7bb64ffae018f314cc280630784037 /usr/app/
+WORKDIR /usr/app
+ENTRYPOINT ["sh -c"]
+ENV APP_FILE=hotelservice-0.0.1-SNAPSHOT.jar
+CMD ["exec java -jar $APP_FILE"]

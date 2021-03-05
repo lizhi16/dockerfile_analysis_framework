@@ -109,13 +109,17 @@ def resolve_imageHistory(image, tag):
         for commands in content[0]["layers"]:
             #if filter.exsit(commands["instruction"], "meaningless_words", "or"):
             #    continue
-            if "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
-                imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace("/bin/sh -c", "RUN").replace(" in ", " ").replace("]", "").replace("[", "")
-            else:
-                imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace(" in ", " ").replace("\" \"", " ")
+            try:
+                if "ENTRYPOINT" not in commands["instruction"] and "CMD" not in commands["instruction"]:
+                    imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace("/bin/sh -c", "RUN").replace(" in ", " ").replace("]", "").replace("[", "")
+                else:
+                    imageHistory = imageHistory + "\n" + commands["instruction"].strip().replace(" in ", " ").replace("\" \"", " ")
+            except:
+                continue
         return imageHistory
     
     except Exception as e:
+        print (e)
         return imageHistory
 
 def check_github_repo(user, imageName):

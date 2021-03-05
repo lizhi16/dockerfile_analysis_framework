@@ -27,7 +27,7 @@ def main():
     index = 1
     total = len(images)
 
-    cores = 1
+    cores = 16
     analyze_thread = []
 
     for image in images:
