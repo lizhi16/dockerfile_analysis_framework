@@ -8,10 +8,10 @@ def build_dataset():
     images = read_raw_data()
     for image in images:
         words = ""
-        label.append(image)
         for command in images[image]:
             words = words + " " + clean_data(command)
         data.append(words)
+        label.append(image)
 
     return data, label
 

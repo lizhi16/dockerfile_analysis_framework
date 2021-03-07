@@ -37,8 +37,10 @@ def main():
         
         # output the rate of processing
         index = index + 1
-        if index % 100 == 0:
+        if index % 1000 == 0:
             print ("Completing: [" + str(index) + "/" + str(total) + "]")
+            write_log()
+            results = {}
 
         thread = detecting_thread(image)
         # keep the threads < cores numbers
@@ -55,6 +57,10 @@ def main():
     for t in analyze_thread:
         t.join()
     
+    write_log()
+    
+def write_log():
+    global results
     try:
         prefix = sys.argv[1].split("/")[2]
     except:
@@ -62,8 +68,12 @@ def main():
 
     with open("./results/words-" + prefix + ".list", "a+") as log:
         for item in results:
-            log.write(str(item) + "; " + str(results[item]) + "\n")
-    
+            try:
+                itemText = u' '.join(results[item]).encode("utf-8").strip()
+                log.write(str(item) + "; " + itemText + "\n")
+            except:
+                log.write(str(item) + "; " + "\n")
+
 
 if __name__ == '__main__':
     main()

@@ -10,6 +10,7 @@ from json import dumps
 from dockerfile_parser import parser 
 
 # major function
+# paras "dockerfile": return from crawler.resolve_images_info(image)
 def dockerfile2bash(dockerfile):
     cmds = []
     commands = dockerfile2cmds(dockerfile)
@@ -35,7 +36,6 @@ def dockerfile2bash(dockerfile):
 
     return cmds
 
-# paras "dockerfile": return from crawler.resolve_images_info(image)
 def dockerfile2cmds(dockerfile):
     commands = {}
     if dockerfile == None or dockerfile == "":

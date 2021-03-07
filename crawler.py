@@ -44,7 +44,6 @@ def get_url(url):
 
     try:
         content = requests.get(url, headers=headers)
-        print (url, content.status_code)
         while content.status_code == 429:
             print ("[WARN] wait for 429!")
             time.sleep(60)
@@ -55,7 +54,7 @@ def get_url(url):
         else:
             return ""
     except Exception as e:
-        print ("429 !!!!!!!!!!!!!", e)
+        print ("why 429 !!!!!!!!!!!!!", e)
         return ""
 
 def resolve_tags(image):
