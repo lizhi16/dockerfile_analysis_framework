@@ -1,17 +1,47 @@
 import os
 
-docPath = "../results/"
+docPath = "../dataset/"
 
-def build_dataset():
+# method: 
+# 0. whole images
+# 1. slide windows
+def build_dataset(method):
     data = []
     label = []
-    images = read_raw_data()
+    images = read_raw_cmds_data()
     for image in images:
-        words = ""
-        for command in images[image]:
-            words = words + " " + clean_data(command)
-        data.append(words)
-        label.append(image)
+        if method == 0:
+            words = ""
+            for command in images[image]:
+                words = words + " " + clean_data(command)
+            data.append(words)
+            label.append(image)
+        elif method == 1:
+            windows = 3
+            try:
+                for i in range(len(images[image]) - windows):
+                    command = images[image]
+                    words = ""
+                    for j in range(windows):
+                        words =  words + " " + clean_data(command[i + j])
+
+                    if len(words.strip()) == 0:
+                        continue
+                
+                    data.append(words)
+                    label.append(image)
+            except:
+                words = ""
+                for i in range(len(images[image])):
+                    command = images[image]
+                    words =  words + " " + clean_data(command[i]) 
+
+                if len(words.strip()) == 0:
+                    continue
+                
+                data.append(words)
+                label.append(image)
+
 
     return data, label
 
@@ -33,11 +63,14 @@ def clean_data(words_list):
     
     return doc
 
-def read_raw_data():
+# read commands' words
+def read_raw_cmds_data():
     paths = []
     files = os.walk(docPath)  
     for path, dirs, files in files:  
         for file in files:
+            if "word" not in file:
+                continue
             paths.append(os.path.join(path, file))
 
     images = {}
@@ -63,3 +96,4 @@ def read_raw_data():
     return images
 
 #print(len(read_data()))
+

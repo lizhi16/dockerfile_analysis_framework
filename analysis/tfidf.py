@@ -76,7 +76,11 @@ class Cluster(object):
         with open("birch_class_dockerfile.csv", "w+") as log:
             log.write("class, imageName\n")
             for item in cluster_dict:
+                duplicate = []
                 for image in cluster_dict[item]:
+                    if image in duplicate:
+                        continue
+                    duplicate.append(image)
                     log.write(str(item) + ", " + str(image) + "\n")
 
     def dbscan(self):
@@ -98,6 +102,6 @@ class Cluster(object):
         print (result)
 
 
-data, label = dataset.build_dataset()
+data, label = dataset.build_dataset(1)
 cluster = Cluster(data, label)
 cluster.birch_cluster()

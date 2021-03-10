@@ -69,8 +69,8 @@ def write_log():
     with open("./results/words-" + prefix + ".list", "a+") as log:
         for item in results:
             try:
-                itemText = results[item].encode("utf-8").strip()
-                log.write(str(item) + "; " + itemText + "\n")
+                itemText = u''.join(results[item]).encode("utf-8").strip()
+                log.write(str(item) + "; " + str(itemText) + "\n")
             except:
                 log.write(str(item) + "; " + "\n")
 

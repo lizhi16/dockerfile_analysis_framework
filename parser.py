@@ -1,6 +1,7 @@
 ################### Parser Dockerfile #####################
 import json
 import crawler
+import filter
 import collections, logging, itertools
 
 import bashlex.parser
@@ -106,6 +107,8 @@ def parse_cmds_from_dockerfile(dockerfile):
 
     try:
         for item in dockerfile['workdir']['/']['root']['run']:
+            if filter.exsit(item, None, "or"):
+                continue
             command = split_bash_cmds(item)
             commands = commands + command
     except:
