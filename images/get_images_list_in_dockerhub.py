@@ -1,111 +1,96 @@
 import sys
-import math
+import time
 import threading
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait as Wait
-from selenium.webdriver.support import expected_conditions as Expect
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import requests
 
-imagesList = {}
-basePath = "./keywords-list/"
-keywordsPath = basePath + sys.argv[1]
-imagesSavePath = "./results/" + sys.argv[1] + ".list"
+def get_images_url(keyword, url):
+    if url == "":
+        return ""
 
-cap = DesiredCapabilities().FIREFOX
-options = Options()
-options.headless = True
-#browser = webdriver.Firefox(options=options, capabilities=cap, firefox_binary = "/usr/lib64/firefox/firefox", executable_path = "/home/lz/dockerhub-scan/geckodriver")
-browser = webdriver.Firefox(options=options, capabilities=cap, executable_path = "/home/lz/dockerhub-scan/geckodriver")
+    # payload={}
+    headers = {
+        'Connection': 'keep-alive',
+        'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        'sec-ch-ua-mobile': '?0',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36',
+        'Content-Type': 'application/json',
+        'Search-Version': 'v3',
+        'Accept': 'application/json',
+        'X-DOCKER-API-CLIENT': 'docker-hub/1280.0.0',
+        'sec-ch-ua-platform': '"macOS"',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Dest': 'empty',
+        'Referer': 'https://hub.docker.com/search?q={}&type=image'.format(keyword),
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+    }
+
+    # response = requests.request("GET", url, headers=headers, data=payload)
+
+    try:
+        content = requests.get(url, headers = headers)
+        while content.status_code == 429:
+            print ("[WARN] wait for 429!")
+            time.sleep(60)
+            content = requests.get(url, headers=headers)
+
+        if content.status_code == 200:
+            return content
+        else:
+            return ""
+    except Exception as e:
+        print ("why 429 !!!!!!!!!!!!!", e)
+        return ""
 
 class resolve_images_thread(threading.Thread):
     def __init__(self, keyword):
-        global imagesList
         threading.Thread.__init__(self)
         self.keyword = keyword.strip()
-        self.pages = 1
-        self.flag = 0
-
-        #options = Options()
-        #options.headless = True
-        #self.browser = webdriver.Firefox(options=options)
+        self.images = {}
 
     def run(self):
-        print('Start resolving images Thread: ', self.keyword)
         self.resolve_images_list()
-        #self.browser.quit()
 
     def resolve_images_list(self):
-        imagelist = ""
-        index = 1
-        while index <= self.pages:
-            url = "https://hub.docker.com/search?q={}&type=image&page={}&page_size=50".format(self.keyword, str(index))
-            for i in range(5):
+        url = "https://hub.docker.com/api/content/v1/products/search?page_size=100&q={}&type=image".format(self.keyword)
+        while url != "":
+            content = get_images_url(self.keyword, url)
+            if content == "":
+                break 
+            
+            content = content.json()
+            url = content["next"]
+
+            for images in content["summaries"]:
                 try:
-                    browser.get(url)
-                    break
-                except Exception as e:
+                    image = str(images["name"])
+                    created = str(images["created_at"])
+                    updated = str(images["updated_at"])
+
+                    if image not in self.images:
+                        self.images[image] = image + ", " + created + ", " + updated
+                except:
                     continue
-                    pass
 
-            try:
-                 element = Wait(browser, 10).until(
-                    Expect.presence_of_element_located((By.ID, "searchResults"))
-                 )
-            except Exception as e:
-                 with open("./failed_keyword.list", "a+") as fail:
-                    fail.write(self.keyword)
-
-            if 'no results' in element.text:
-                print ("There doesn't have search results...")
-                return 0
-
-            if self.flag == 0:
-                soup = BeautifulSoup(browser.page_source,'html.parser')
-                links = soup.find_all('div',class_="styles__currentSearch___35kW_")
-                for link in links:
-                    if "-" in link.div.text and "of" in link.div.text:
-                        num = link.div.text.split()[4]
-                        self.pages = check_number(num)
-                        self.flag = 1
-
-            content = element.text.split('\n')
-            for index in range(len(content)):
-                if 'Updated' in content[index] and 'ago' in content[index]:
-                    if '/' in content[index-1] and content[index-1] not in imagesList.keys():
-                        imagesList[content[index-1]] = 1
-                        imagelist = imagelist + content[index-1] + "\n"
-
-        with open(imagesSavePath, 'a+') as images_list:
-            images_list.write(imagelist)
-
-def check_number(number):
-    num = str(number).split(',')
-    # num over 1,000,000
-    if len(num) > 2:
-        return 0
-    # num less 1,000
-    elif len(num) == 1:
-        return math.ceil(int(number)/50)
-
-    try:
-        imageNum = int(num[0]) * 1000 + int(num[1])
-        if imageNum < 2500:
-            return math.ceil(imageNum/50)
-    except Exception as e:
-        return 0
-
-    return 0
+    def get_results(self):
+        return self.images
 
 def main():
-    cores = 1
-    file =  open(keywordsPath, "r+")
-    lines = file.readlines()
+    cores = 16
+    keywords = {}
+    with open(sys.argv[1], "r") as log:
+        for line in log.readlines():
+            line = line.strip()
+            if line not in keywords:
+                keywords[line] = 1
 
     crawl_thread = []
-    for keyword in lines:
+    index = 0
+    total = str(len(keywords))
+    for keyword in keywords:
+        index += 1
+        print("[" + str(index) + "/" + total + "] " + keyword)
+
         thread = resolve_images_thread(keyword)
         # keep the threads < cores numbers
         if len(threading.enumerate()) <= cores:
@@ -113,14 +98,29 @@ def main():
             crawl_thread.append(thread)
         else:
             for t in crawl_thread:
+                if not t.isAlive():
+                    continue
+                
                 t.join()
+                imgs = t.get_results()
+                save_data(imgs)
+                break
+
+            thread.start()
+            crawl_thread.append(thread)
 
     for t in crawl_thread:
+        if not t.isAlive():
+            continue
+        
         t.join()
+        imgs = t.get_results()
+        save_data(imgs)
 
-    file.close()
-    browser.quit()
+def save_data(images):
+    with open("./results/all_images.list", "a+") as log:
+        for img in images:
+            log.write(images[img] + "\n")
 
 if __name__ == "__main__":
     main()
-
